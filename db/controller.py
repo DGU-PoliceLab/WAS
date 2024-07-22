@@ -150,13 +150,22 @@ class RedisMQ():
          while True:
             cur = json.dumps("")
             conn.set('realtime', cur)
-            time.sleep(1)
+            time.sleep(5)
 
     def recv(self, key):
         try:
             queue, message = self.conn.brpop(key)
             _message = json.loads(message)
             return _message
+        except Exception as e:
+            print("Error occured in db.controller.recv",e)
+            return False
+        
+    def live(self):
+        try:
+            response = json.loads(self.conn.get('realtime'))
+            print(response)
+            return response
         except Exception as e:
             print("Error occured in db.controller.recv",e)
             return False

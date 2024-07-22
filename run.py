@@ -11,7 +11,7 @@ from services import cctv as Cctv
 from services import event as Event
 from services import location as Location
 from services import log as Log
-from models.log import LogReadModel
+from models.log import LogReadModel, LogCheckModel
 from models.cctv import CctvCreateModel, CctvUpdateModel, CctvDeleteModel
 from models.location import LocationCreateModel, LocationReadModel, LocationUpdateModel, LocationDeleteModel
 from models.event import EventCreateModel, EventReadModel, EventUpdateModel, EventDeleteModel
@@ -95,8 +95,12 @@ def create_location(option: LocationCreateModel):
 
 @app.post('/location/read')
 def read_location(option: LocationReadModel):
-    print(option.target, type(option.target))
     response = Location.read(option.target)
+    return response
+
+@app.post('/location/read/cctv')
+def read_location_cctv():
+    response = Location.read_with_cctv()
     return response
 
 @app.post('/location/update')
@@ -115,15 +119,25 @@ def read_log(option: LogReadModel):
     response = Log.read(option.datetime, option.locations, option.types)
     return response
 
+@app.post('/log/check')
+def read_log(option: LogCheckModel):
+    response = Log.check(option.target)
+    return response
+
 # Message Service
 @app.post('/message/send')
 def message_send(option:MessageSendModel):
     response = mq.send(option.key, option.message)
     return response
 
-@app.post('/message/send')
+@app.post('/message/recv')
 def message_send(option:MessageRecvModel):
     response = mq.recv(option.key)
+    return response
+
+@app.post('/message/live')
+def message_live():
+    response = mq.live()
     return response
 
 # RTSP Services

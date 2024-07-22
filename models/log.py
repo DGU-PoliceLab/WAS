@@ -5,3 +5,7 @@ class LogReadModel(BaseModel):
     datetime: Optional[list] = []
     locations: Optional[list] = []
     types: Optional[list] = []
+
+
+class LogCheckModel(BaseModel):
+    target: int

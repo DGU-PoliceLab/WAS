@@ -30,6 +30,16 @@ def read(target):
     except Exception as e:
         print("Error occured in services.location.read",e)
 
+def read_with_cctv():
+    try:
+        db = MysqlDB()
+        sql = "SELECT l.id as location_id, l.name as location_name, cctv as cctv_id, c.name as cctv_name, url, created_at FROM location as l LEFT JOIN cctv as c ON l.cctv = c.id WHERE c.id IS NOT NULL"
+        db.cur.execute(sql)
+        response = db.cur.fetchall()
+        return response
+    except Exception as e:
+        print("Error occured in services.location.read",e)
+
 def update(target, values):
     try:
         db = MysqlDB()

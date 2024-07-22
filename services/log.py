@@ -1,3 +1,4 @@
+from utils.time import now
 from db.controller import MysqlDB
 
 def read(datetime = [], locations = [], types = []):
@@ -35,3 +36,19 @@ def read(datetime = [], locations = [], types = []):
         return response
     except Exception as e:
         print("Error occured in services.location.read",e)
+
+def check(target):
+    try:
+        db = MysqlDB()
+        n = now()
+        if target == -1:
+            sql = "UPDATE log SET checked_at = %s WHERE checked_at IS NULL"
+            db.cur.execute(sql, (n))
+        else:
+            sql = "UPDATE log SET checked_at = %s WHERE id = %s AND checked_at IS NULL"
+            db.cur.execute(sql, (n, target))
+        db.conn.commit()
+        return True
+    except Exception as e:
+        print("Error occured in services.location.check",e)
+        return False
