@@ -1,6 +1,8 @@
-def create(db, name, cctv):
+from db.controller import MysqlDB
+
+def create(name, cctv):
     try:
-        print(cctv, type(cctv))
+        db = MysqlDB()
         if type(cctv) == int:
             sql = "INSERT INTO location (name, cctv) VALUE (%s, %s)"
             db.cur.execute(sql, (name, cctv))
@@ -11,12 +13,15 @@ def create(db, name, cctv):
     except Exception as e:
         print("Error occured in services.location.create",e)
 
-def read(db, target):
+def read(target):
     try:
-        if type(target) == tuple:
+        db = MysqlDB()
+        if target == "":
             sql = "SELECT * FROM location"
+            print(sql)
             db.cur.execute(sql)
             response = db.cur.fetchall()
+            print(response)
         else:
             sql = "SELECT * FROM location WHERE id = %s"
             db.cur.execute(sql, (target))
@@ -25,8 +30,9 @@ def read(db, target):
     except Exception as e:
         print("Error occured in services.location.read",e)
 
-def update(db, target, values):
+def update(target, values):
     try:
+        db = MysqlDB()
         if len(values) == 1:
             sql = "UPDATE location SET name = %s WHERE id = %s"
             db.cur.execute(sql, (values[0], target))
@@ -37,16 +43,18 @@ def update(db, target, values):
     except Exception as e:
         print("Error occured in services.location.update",e)
 
-def update_cctv(db, target, cctv):
+def update_cctv(target, cctv):
     try:
+        db = MysqlDB()
         sql = "UPDATE location SET cctv = %s WHERE id = %s"
         db.cur.execute(sql, (cctv, target))
         db.conn.commit()
     except Exception as e:
         print("Error occured in services.location.update_cctv",e)
 
-def delete(db, target):
+def delete(target):
     try:
+        db = MysqlDB()
         sql = "DELETE FROM location WHERE id = %s"
         db.cur.execute(sql, (target))
         db.conn.commit()

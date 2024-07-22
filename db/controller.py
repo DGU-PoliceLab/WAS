@@ -1,6 +1,9 @@
 import pymysql
 import redis
 import json
+import time
+from threading import Thread
+from datetime import datetime
 from db.config import config_redis, config_mysql
 from utils.time import timestamp
 
@@ -49,7 +52,6 @@ class MysqlDB():
                 sql = f"INSERT INTO {table} VALUES ({_values});"
             else:
                 sql = f"INSERT INTO {table} ({_columns}) VALUE ({_values});"
-            print(sql)
             self.cur.execute(sql)
             self.conn.commit()
         except Exception as e:
@@ -104,16 +106,31 @@ class RedisMQ():
                 db=self.config['db'],
             )
             self.mysql = MysqlDB()
+            cleaner_thread = Thread(target=self._cleaner, args=(self.conn,))
+            cleaner_thread.start()
         except Exception as e:
             print("Error occured in db.controller.connect",e)
 
     def _save(self, message):
         try:
+            if isinstance(message['occurred_at'], datetime):
+                occured_at = message['occurred_at']
+            else:
+                occured_at = datetime.fromtimestamp(message['occurred_at'])
+            pre = json.loads(self.conn.get('realtime'))
+            if pre == "":
+                cur = str(message)
+            else:
+                cur = pre + ", " + str(message)
+            cur = json.dumps(cur)
+            self.conn.set('realtime', cur)
             sql = "INSERT INTO log (type, location, occurred_at) VALUE (%s, %s ,%s)"
-            self.mysql.cur.execute(sql, (message['event'], message['location'], message['occurred_at']))
+            self.mysql.cur.execute(sql, (message['event'], message['location'],occured_at))
             self.mysql.conn.commit()
+            return True
         except Exception as e:
             print("Error occured in db.controller._save",e)
+            return False
 
     def send(self, key, message):
         try:
@@ -124,8 +141,16 @@ class RedisMQ():
                 pass
             _message = json.dumps(message)
             self.conn.lpush(key, _message)
+            return True
         except Exception as e:
             print("Error occured in db.controller.send",e)
+            return False
+        
+    def _cleaner(self, conn):
+         while True:
+            cur = json.dumps("")
+            conn.set('realtime', cur)
+            time.sleep(1)
 
     def recv(self, key):
         try:
@@ -134,6 +159,7 @@ class RedisMQ():
             return _message
         except Exception as e:
             print("Error occured in db.controller.recv",e)
+            return False
 
     def is_empty(self, key):
         try:

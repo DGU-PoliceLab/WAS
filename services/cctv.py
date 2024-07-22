@@ -1,7 +1,9 @@
 from datetime import datetime
+from db.controller import MysqlDB
 
-def create(db, name, url):
+def create(name, url):
     try:
+        db = MysqlDB()
         sql = "INSERT INTO cctv (name, url) VALUE (%s, %s)"
         db.cur.execute(sql, (name, url))
         db.conn.commit()
@@ -10,8 +12,9 @@ def create(db, name, url):
         print("Error occured in services.cctv.create",e)
         return False
 
-def read(db):
+def read():
     try:
+        db = MysqlDB()
         sql = "SELECT * FROM cctv"
         db.cur.execute(sql)
         response = db.cur.fetchall()
@@ -19,8 +22,9 @@ def read(db):
     except Exception as e:
         print("Error occured in services.cctv.read",e)
 
-def update(db, target, name, url):
+def update(target, name, url):
     try:
+        db = MysqlDB()
         now = datetime.now()
         sql = "UPDATE cctv SET name = %s, url = %s, created_at = %s WHERE id = %s"
         db.cur.execute(sql, (name, url, now, target))
@@ -30,8 +34,9 @@ def update(db, target, name, url):
         print("Error occured in services.cctv.update",e)
         return False
 
-def delete(db, target):
+def delete(target):
     try:
+        db = MysqlDB()
         sql = "DELETE FROM cctv WHERE id = %s"
         db.cur.execute(sql, (target))
         db.conn.commit()

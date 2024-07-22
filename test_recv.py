@@ -1,7 +1,5 @@
 import time
-from db.controller import MysqlDB, RedisDB, RedisMQ
-from services import cctv, location, log
-from utils.time import now_timestamp
+from db.controller import RedisMQ
 
 mq = RedisMQ()
 

@@ -1,5 +1,8 @@
-def read(db, datetime = [], locations = [], types = []):
+from db.controller import MysqlDB
+
+def read(datetime = [], locations = [], types = []):
     try:
+        db = MysqlDB()
         _datetime = ""
         _locations = ""
         _types = ""
