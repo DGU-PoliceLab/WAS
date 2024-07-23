@@ -17,7 +17,7 @@ for PID in $PIDS; do
 done
 
 # 프로세스가 종료되었는지 확인합니다.
-sleep 2
+sleep 1
 PIDS=$(pgrep -f hypercorn)
 if [ -z "$PIDS" ]; then
     echo "All Hypercorn processes stopped successfully."

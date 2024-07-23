@@ -3,31 +3,28 @@ from db.controller import MysqlDB
 def create(name, cctv):
     try:
         db = MysqlDB()
-        if type(cctv) == int:
+        if cctv >= 0:
             sql = "INSERT INTO location (name, cctv) VALUE (%s, %s)"
             db.cur.execute(sql, (name, cctv))
         else:
             sql = "INSERT INTO location (name) VALUE (%s)"
             db.cur.execute(sql, (name))
         db.conn.commit()
+        return True
     except Exception as e:
         print("Error occured in services.location.create",e)
+        return False
 
-def read(target):
+def read():
     try:
         db = MysqlDB()
-        if target == "":
-            sql = "SELECT * FROM location"
-            db.cur.execute(sql)
-            response = db.cur.fetchall()
-            print(response)
-        else:
-            sql = "SELECT * FROM location WHERE id = %s"
-            db.cur.execute(sql, (target))
-            response = db.cur.fetchone()
+        sql = "SELECT l.id as location_id, l.name as location_name, cctv as cctv_id, c.name as cctv_name, url, created_at FROM location as l LEFT JOIN cctv as c ON l.cctv = c.id"
+        db.cur.execute(sql)
+        response = db.cur.fetchall()
         return response
     except Exception as e:
         print("Error occured in services.location.read",e)
+        return False
 
 def read_with_cctv():
     try:
@@ -38,19 +35,22 @@ def read_with_cctv():
         return response
     except Exception as e:
         print("Error occured in services.location.read",e)
+        return False
 
-def update(target, values):
+def update(target, name, cctv):
     try:
         db = MysqlDB()
-        if len(values) == 1:
-            sql = "UPDATE location SET name = %s WHERE id = %s"
-            db.cur.execute(sql, (values[0], target))
+        if cctv == -1:
+            sql = "UPDATE location SET name = %s, cctv = NULL WHERE id = %s"
+            db.cur.execute(sql, (name, target))
         else:
             sql = "UPDATE location SET name = %s, cctv = %s WHERE id = %s"
-            db.cur.execute(sql, (values[0], values[1], target))
+            db.cur.execute(sql, (name, cctv, target))
         db.conn.commit()
+        return True
     except Exception as e:
         print("Error occured in services.location.update",e)
+        return False
 
 def update_cctv(target, cctv):
     try:
@@ -58,8 +58,10 @@ def update_cctv(target, cctv):
         sql = "UPDATE location SET cctv = %s WHERE id = %s"
         db.cur.execute(sql, (cctv, target))
         db.conn.commit()
+        return True
     except Exception as e:
         print("Error occured in services.location.update_cctv",e)
+        return False
 
 def delete(target):
     try:
@@ -67,5 +69,7 @@ def delete(target):
         sql = "DELETE FROM location WHERE id = %s"
         db.cur.execute(sql, (target))
         db.conn.commit()
+        return True
     except Exception as e:
         print("Error occured in services.location.delete",e)
+        return False

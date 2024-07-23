@@ -16,7 +16,7 @@ from services import log as Log
 from services import snap as Snap
 from models.log import LogReadModel, LogCheckModel
 from models.cctv import CctvCreateModel, CctvUpdateModel, CctvDeleteModel
-from models.location import LocationCreateModel, LocationReadModel, LocationUpdateModel, LocationDeleteModel
+from models.location import LocationCreateModel, LocationUpdateModel, LocationDeleteModel
 from models.event import EventCreateModel, EventReadModel, EventUpdateModel, EventDeleteModel
 from models.message import MessageSendModel, MessageRecvModel
 from models.rtsp import RtspSnapModel
@@ -28,9 +28,9 @@ redis = RedisDB()
 redis_client = aioredis.from_url("redis://localhost:50001")
 mq = RedisMQ()
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("uvicorn.error")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 origins = [
     "https://localhost",
@@ -101,8 +101,8 @@ def create_location(option: LocationCreateModel):
     return response
 
 @app.post('/location/read')
-def read_location(option: LocationReadModel):
-    response = Location.read(option.target)
+def read_location():
+    response = Location.read()
     return response
 
 @app.post('/location/read/cctv')
@@ -112,11 +112,13 @@ def read_location_cctv():
 
 @app.post('/location/update')
 def update_location(option: LocationUpdateModel):
-    response = Location.update(option.target, option.name, option.url)
+    response = Location.update(option.target, option.name, option.cctv)
     return response
 
 @app.post('/location/delete')
 def delete_location(option: LocationDeleteModel):
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
+    print(option)
     response = Location.delete(option.target)
     return response
 

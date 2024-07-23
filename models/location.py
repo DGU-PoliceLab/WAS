@@ -3,15 +3,12 @@ from pydantic import BaseModel
 
 class LocationCreateModel(BaseModel):
     name: str
-    cctv: str
-
-class LocationReadModel(BaseModel):
-    target: Optional[str] = None
+    cctv: int
     
 class LocationUpdateModel(BaseModel):
     target: int
     name: str
-    url: str
+    cctv: int
 
 class LocationDeleteModel(BaseModel):
     target: int
