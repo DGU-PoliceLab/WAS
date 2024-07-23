@@ -1,23 +1,26 @@
 from fastapi import FastAPI, WebSocket
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 # import uvicorn
+import logging
 import time
 from starlette.middleware.cors import CORSMiddleware
 import base64
-import asyncio
 import redis.asyncio as aioredis
 from db.controller import MysqlDB, RedisDB, RedisMQ
 from services import cctv as Cctv
 from services import event as Event
 from services import location as Location
+from services import rtsp as RTSP
 from services import log as Log
+from services import snap as Snap
 from models.log import LogReadModel, LogCheckModel
 from models.cctv import CctvCreateModel, CctvUpdateModel, CctvDeleteModel
 from models.location import LocationCreateModel, LocationReadModel, LocationUpdateModel, LocationDeleteModel
 from models.event import EventCreateModel, EventReadModel, EventUpdateModel, EventDeleteModel
 from models.message import MessageSendModel, MessageRecvModel
-from models.rtsp import RtspModel
-from utils.stream import getRtspStream
+from models.rtsp import RtspSnapModel
+from models.snap import SnapReadModel, SnapUpdateModel
 
 app = FastAPI()
 mysql = MysqlDB()
@@ -25,9 +28,13 @@ redis = RedisDB()
 redis_client = aioredis.from_url("redis://localhost:50001")
 mq = RedisMQ()
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("uvicorn.error")
+logger.setLevel(logging.DEBUG)
+
 origins = [
-    "http://localhost",
-    "http://localhost:5173"
+    "https://localhost",
+    "https://localhost:5173"
 ]
 
 app.add_middleware(
@@ -37,13 +44,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/file/snap", StaticFiles(directory="static/snap"), name="snap")
+app.mount("/file/clip", StaticFiles(directory="static/clip"), name="clip")
 
-# Root Service
+# Root Services
 @app.get("/")
 def read_root():
     return {"msg": "Server Is Working"}
 
-# CCTV Service
+# CCTV Services
 @app.post('/cctv/create')
 def create_cctv(option: CctvCreateModel):
     response = Cctv.create(option.name, option.url)
@@ -61,7 +70,6 @@ def update_cctv(option: CctvUpdateModel):
 
 @app.post('/cctv/delete')
 def delete_cctv(option: CctvDeleteModel):
-    print(option.target, type(option.target))
     response = Cctv.delete(option.target)
     return response
 
@@ -73,7 +81,6 @@ def create_event(option: EventCreateModel):
 
 @app.post('/event/read')
 def read_event(option: EventReadModel):
-    print(option.target, type(option.target))
     response = Event.read(option.target)
     return response
 
@@ -124,14 +131,14 @@ def read_log(option: LogCheckModel):
     response = Log.check(option.target)
     return response
 
-# Message Service
+# Message Services
 @app.post('/message/send')
-def message_send(option:MessageSendModel):
+def message_send(option: MessageSendModel):
     response = mq.send(option.key, option.message)
     return response
 
 @app.post('/message/recv')
-def message_send(option:MessageRecvModel):
+def message_send(option: MessageRecvModel):
     response = mq.recv(option.key)
     return response
 
@@ -146,8 +153,23 @@ def stream_rtsp(url: str):
     url_bytes = url.encode('ascii')
     decoded = base64.b64decode(url_bytes)
     str_url = decoded.decode('UTF-8')
-    print(str_url)
-    return StreamingResponse(getRtspStream(str_url), media_type="multipart/x-mixed-replace; boundary=PNPframe")
+    return StreamingResponse(RTSP.getRtspStream(str_url), media_type="multipart/x-mixed-replace; boundary=PNPframe")
+
+@app.post("/rtsp/snap")
+def stream_rtsp(option: RtspSnapModel):
+    response = RTSP.snapshot(option.location, option.url, option.target)
+    return response
+
+# Snap Services
+@app.post("/snap/read")
+def stream_rtsp(option: SnapReadModel):
+    response = Snap.read(option.target)
+    return response
+
+@app.post("/snap/update")
+def stream_rtsp(option: SnapUpdateModel):
+    response = Snap.update(option.target, option.url, option.data)
+    return response
 
 # Message Services
 # @app.websocket("/ws")

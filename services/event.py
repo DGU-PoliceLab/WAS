@@ -14,10 +14,8 @@ def read(target):
         db = MysqlDB()
         if target == "":
             sql = "SELECT * FROM event"
-            print(sql)
             db.cur.execute(sql)
             response = db.cur.fetchall()
-            print(response)
         else:
             sql = "SELECT * FROM event WHERE id = %s"
             db.cur.execute(sql, (target))

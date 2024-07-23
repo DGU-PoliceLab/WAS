@@ -18,7 +18,6 @@ def read(target):
         db = MysqlDB()
         if target == "":
             sql = "SELECT * FROM location"
-            print(sql)
             db.cur.execute(sql)
             response = db.cur.fetchall()
             print(response)

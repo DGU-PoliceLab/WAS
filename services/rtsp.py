@@ -15,3 +15,4 @@ def getRtspStream(url):
             frame = buffer.tobytes()
             yield (b'--PNPframe\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            

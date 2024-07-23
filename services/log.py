@@ -7,6 +7,7 @@ def read(datetime = [], locations = [], types = []):
         _datetime = ""
         _locations = ""
         _types = ""
+        sql = ""
         if datetime != []:
             _datetime = f"occurred_at BETWEEN {datetime[0]} AND {datetime[1]}"
         if locations != []:

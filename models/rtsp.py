@@ -1,5 +1,11 @@
-from typing import Optional
+from typing import List
 from pydantic import BaseModel
 
-class RtspModel(BaseModel):
-    url: Optional[str] = 0
+class BBox(BaseModel):
+    tid: int
+    bbox: List[int]
+
+class RtspSnapModel(BaseModel):
+    location: int
+    url: str
+    target: List[BBox]
