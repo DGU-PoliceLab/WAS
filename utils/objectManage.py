@@ -24,17 +24,21 @@ class ObjectManager():
             byteData = self.conn.get("snap")
             objectData = self._to_data(byteData)
             if target is not None:
-                return objectData[target]
+                if target in objectData:
+                    return objectData[target]
+                else:
+                    return []
             else:
                 return objectData
         except Exception as e:
-            print("Error occurred in utils.objectManage.ObjectManager.update:", e)
+            print("Error occurred in utils.objectManage.ObjectManager.read:", e)
             return False
         
     def update(self, target, url, data):
         try:
             # data = snapshot(url, data) # disable snapshot function
             objectData = self.read()
+            print(objectData)
             objectData[target] = data
             byteData = self._to_byte(objectData)
             self.conn.set("snap", byteData)
