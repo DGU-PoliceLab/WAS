@@ -22,6 +22,19 @@ def read():
     except Exception as e:
         print("Error occured in services.cctv.read",e)
 
+def check(name):
+    try:
+        db = MysqlDB()
+        sql = "SELECT * FROM cctv WHERE name = %s"
+        db.cur.execute(sql, (name))
+        response = db.cur.fetchall()
+        if len(response) == 0:
+            return True
+        else:
+            return False
+    except Exception as e:
+        print("Error occured in services.cctv.check_duplicate",e)
+
 def update(target, name, url):
     try:
         db = MysqlDB()

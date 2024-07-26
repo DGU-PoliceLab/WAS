@@ -15,7 +15,7 @@ from services import rtsp as RTSP
 from services import log as Log
 from services import snap as Snap
 from models.log import LogReadModel, LogCheckModel
-from models.cctv import CctvCreateModel, CctvUpdateModel, CctvDeleteModel
+from models.cctv import CctvCreateModel, CctvCheckModel, CctvUpdateModel, CctvDeleteModel
 from models.location import LocationCreateModel, LocationUpdateModel, LocationDeleteModel
 from models.event import EventCreateModel, EventReadModel, EventUpdateModel, EventDeleteModel
 from models.message import MessageSendModel, MessageRecvModel
@@ -63,6 +63,11 @@ def create_cctv(option: CctvCreateModel):
 @app.post('/cctv/read')
 def read_cctv():
     response = Cctv.read()
+    return response
+
+@app.post('/cctv/check')
+def read_cctv(option: CctvCheckModel):
+    response = Cctv.check(option.name)
     return response
 
 @app.post('/cctv/update')
