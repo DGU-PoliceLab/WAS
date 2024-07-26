@@ -36,7 +36,7 @@ def read(datetime = [], locations = [], types = []):
         print("Error occured in services.log.read", e)
         return []
     
-def read(datetime = [], locations = [], types = []):
+def readLimit(datetime = [], locations = [], types = []):
     try:
         db = MysqlDB()
         query_params = []
@@ -67,7 +67,7 @@ def read(datetime = [], locations = [], types = []):
         response = db.cur.fetchall()
         return response
     except Exception as e:
-        print("Error occured in services.log.read", e)
+        print("Error occured in services.log.readLimit", e)
         return []
 
 def check(target):
