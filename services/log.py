@@ -1,42 +1,40 @@
+from datetime import datetime as dt
 from utils.time import now
 from db.controller import MysqlDB
 
 def read(datetime = [], locations = [], types = []):
     try:
         db = MysqlDB()
-        _datetime = ""
-        _locations = ""
-        _types = ""
-        sql = ""
-        if datetime != []:
-            _datetime = f"occurred_at BETWEEN {datetime[0]} AND {datetime[1]}"
-        if locations != []:
-            _location_list = [f"'{l}'" for l in locations]
-            _location_list = ", ".join(_location_list)
-            _locations = f"location IN ({_location_list})"
-        if types != []:
-            _type_list = [f"'{t}'" for t in types]
-            _type_list = ", ".join(_type_list)
-            _types = f"type IN ({_type_list})"
+        query_params = []
+        conditions = []
+
+        if datetime:
+            start_time = dt.strptime(datetime[0], "%Y-%m-%dT%H:%M:%S.%fZ")
+            end_time = dt.strptime(datetime[1], "%Y-%m-%dT%H:%M:%S.%fZ")
+            conditions.append("occurred_at BETWEEN %s AND %s")
+            query_params.extend([start_time, end_time])
+
+        if locations:
+            _locations = ", ".join(["%s"] * len(locations))
+            conditions.append(f"location IN ({_locations})")
+            query_params.extend(locations)
+
+        if types:
+            _types = ", ".join(["%s"] * len(types))
+            conditions.append(f"type IN ({_types})")
+            query_params.extend(types)
+
         sql = "SELECT * FROM log"
-        if _datetime != "" or _locations != "" or _types != "":
-            sql += " WHERE"
-            if _datetime != "":
-                sql += " " + _datetime
-            if _locations != "":
-                if _datetime != "":
-                    sql += " AND"
-                sql += " " + _locations
-            if _types != "":
-                if _datetime != "" or _locations != "":
-                    sql += " AND"
-                sql += " " + _types         
+        if conditions:
+            sql += " WHERE " + " AND ".join(conditions)
         sql += " ORDER BY id DESC"
-        db.cur.execute(sql)
+
+        db.cur.execute(sql, query_params)
         response = db.cur.fetchall()
         return response
     except Exception as e:
-        print("Error occured in services.location.read",e)
+        print("Error occured in services.log.read", e)
+        return []
 
 def check(target):
     try:
@@ -51,5 +49,5 @@ def check(target):
         db.conn.commit()
         return True
     except Exception as e:
-        print("Error occured in services.location.check",e)
+        print("Error occured in services.log.check",e)
         return False
