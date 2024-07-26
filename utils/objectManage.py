@@ -33,7 +33,7 @@ class ObjectManager():
         
     def update(self, target, url, data):
         try:
-            data = snapshot(url, data)
+            # data = snapshot(url, data) # disable snapshot function
             objectData = self.read()
             objectData[target] = data
             byteData = self._to_byte(objectData)

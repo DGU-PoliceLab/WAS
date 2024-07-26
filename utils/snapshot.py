@@ -45,7 +45,7 @@ def snapshot(url, data):
             cv2.imwrite(save_file_path, cropped_image)
             data[idx].thumb = filename
         
-        cap.release()
+        # cap.release()
         return data
     except Exception as e:
         print("Error occurred in utils.snapshot.snapshot:", e)
