@@ -33,10 +33,11 @@ logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
 
 origins = [
+    "*",
     "https://localhost",
     "https://localhost:5173",
-    "http://127.0.0.1",  # 추가 가능한 도메인
-    "http://127.0.0.1:5173",  # 추가 가능한 도메인
+    "https://127.0.0.1",  # 추가 가능한 도메인
+    "https://127.0.0.1:5173",  # 추가 가능한 도메인
 ]
 
 app.add_middleware(
