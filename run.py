@@ -128,6 +128,12 @@ def read_log(option: LogReadModel):
     response = Log.read(option.datetime, option.locations, option.types)
     return response
 
+@app.post('/log/read/limit')
+def read_log(option: LogReadModel):
+    response = Log.readLimit(option.datetime, option.locations, option.types)
+    return response
+
+
 @app.post('/log/check')
 def read_log(option: LogCheckModel):
     response = Log.check(option.target)
