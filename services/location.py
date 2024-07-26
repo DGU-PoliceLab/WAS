@@ -25,6 +25,20 @@ def read():
     except Exception as e:
         print("Error occured in services.location.read",e)
         return False
+    
+def check(name):
+    try:
+        db = MysqlDB()
+        sql = "SELECT * FROM location WHERE name = %s"
+        db.cur.execute(sql, (name))
+        response = db.cur.fetchall()
+        if len(response) == 0:
+            return True
+        else:
+            return False
+    except Exception as e:
+        print("Error occured in services.location.read",e)
+        return False
 
 def read_with_cctv():
     try:

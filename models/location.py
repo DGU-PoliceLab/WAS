@@ -5,6 +5,9 @@ class LocationCreateModel(BaseModel):
     name: str
     cctv: int
     
+class LocationCheckModel(BaseModel):
+    name: str
+
 class LocationUpdateModel(BaseModel):
     target: int
     name: str

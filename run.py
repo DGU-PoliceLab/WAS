@@ -16,7 +16,7 @@ from services import log as Log
 from services import snap as Snap
 from models.log import LogReadModel, LogCheckModel
 from models.cctv import CctvCreateModel, CctvCheckModel, CctvUpdateModel, CctvDeleteModel
-from models.location import LocationCreateModel, LocationUpdateModel, LocationDeleteModel
+from models.location import LocationCreateModel, LocationCheckModel, LocationUpdateModel, LocationDeleteModel
 from models.event import EventCreateModel, EventReadModel, EventUpdateModel, EventDeleteModel
 from models.message import MessageSendModel, MessageRecvModel
 from models.rtsp import RtspSnapModel
@@ -110,6 +110,11 @@ def create_location(option: LocationCreateModel):
 @app.post('/location/read')
 def read_location():
     response = Location.read()
+    return response
+
+@app.post('/location/check')
+def read_location(option: LocationCheckModel):
+    response = Location.check(option.name)
     return response
 
 @app.post('/location/read/cctv')
