@@ -1,4 +1,6 @@
 fastapi
 uvicorn
+hypercorn
 redis
 pymysql
+opencv-python

@@ -1,4 +1,4 @@
-bind = ["0.0.0.0:443"]
+bind = ["0.0.0.0:40000"]
 certfile = "./cert.pem"
 keyfile = "./key.pem"
 # worker_class = "uvloop"

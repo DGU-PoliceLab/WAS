@@ -34,7 +34,9 @@ logger.setLevel(logging.INFO)
 
 origins = [
     "https://localhost",
-    "https://localhost:5173"
+    "https://localhost:5173",
+    "http://127.0.0.1",  # 추가 가능한 도메인
+    "http://127.0.0.1:5173",  # 추가 가능한 도메인
 ]
 
 app.add_middleware(
@@ -117,8 +119,6 @@ def update_location(option: LocationUpdateModel):
 
 @app.post('/location/delete')
 def delete_location(option: LocationDeleteModel):
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
-    print(option)
     response = Location.delete(option.target)
     return response
 

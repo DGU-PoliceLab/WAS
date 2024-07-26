@@ -46,7 +46,6 @@ def snapshot(url, data):
             data[idx].thumb = filename
         
         cap.release()
-        print(data)
         return data
     except Exception as e:
         print("Error occurred in utils.snapshot.snapshot:", e)

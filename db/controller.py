@@ -164,7 +164,6 @@ class RedisMQ():
     def live(self):
         try:
             response = json.loads(self.conn.get('realtime'))
-            print(response)
             return response
         except Exception as e:
             print("Error occured in db.controller.recv",e)
