@@ -1,13 +1,13 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import StreamingResponse
-# import uvicorn
-import logging
-import time
+from fastapi.responses import StreamingResponse, HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
+import signal
+import logging
 import base64
+import asyncio
 import redis.asyncio as aioredis
-from db.controller import MysqlDB, RedisDB, RedisMQ
+from db.controller import MysqlDB, RedisDB, RedisMQ, SocketManager
 from services import cctv as Cctv
 from services import event as Event
 from services import location as Location
@@ -27,6 +27,7 @@ mysql = MysqlDB()
 redis = RedisDB()
 redis_client = aioredis.from_url("redis://localhost:50001")
 mq = RedisMQ()
+manager = SocketManager()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("uvicorn.error")
@@ -42,7 +43,8 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    # allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -190,22 +192,14 @@ def stream_rtsp(option: SnapUpdateModel):
     response = Snap.update(option.target, option.url, option.data)
     return response
 
-# Message Services
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     await websocket.accept()
-#     try:
-#         # Redis에서 데이터 가져오는 예제 (실시간 데이터 구독)
-#         pubsub = redis_client.pubsub()
-#         await pubsub.subscribe("realtime_data_channel")
-
-#         while True:
-#             message = await pubsub.get_message(ignore_subscribe_messages=True)
-#             if message:
-#                 await websocket.send_text(message["data"].decode('utf-8'))
-#             await asyncio.sleep(1)
-#     except Exception as e:
-#         print(f"Connection error: {e}")
-#     finally:
-#         await pubsub.unsubscribe("realtime_data_channel")
-#         await websocket.close()
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await asyncio.sleep(1)
+            data = mq.live()
+            if data:
+                await manager.broadcast(data)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
