@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse, HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
@@ -21,13 +21,15 @@ from models.event import EventCreateModel, EventReadModel, EventUpdateModel, Eve
 from models.message import MessageSendModel, MessageRecvModel
 from models.rtsp import RtspSnapModel
 from models.snap import SnapReadModel, SnapUpdateModel
+from utils.clip import clipGroup
 
 app = FastAPI()
 mysql = MysqlDB()
 redis = RedisDB()
 redis_client = aioredis.from_url("redis://localhost:50001")
 mq = RedisMQ()
-manager = SocketManager()
+socketManager = SocketManager()
+clipManagers = clipGroup()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("uvicorn.error")
@@ -154,7 +156,8 @@ def read_log(option: LogCheckModel):
 
 # Message Services
 @app.post('/message/send')
-def message_send(option: MessageSendModel):
+def message_send(option: MessageSendModel, background_tasks: BackgroundTasks):
+    background_tasks.add_task(clipManagers[option.message["location"]].start_recording)
     response = mq.send(option.key, option.message)
     return response
 
@@ -194,12 +197,21 @@ def stream_rtsp(option: SnapUpdateModel):
 
 @app.websocket("/message")
 async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+    await socketManager.connect(websocket)
     try:
         while True:
             await asyncio.sleep(1)
             data = mq.live()
             if data:
-                await manager.broadcast(data)
+                await socketManager.broadcast(data)
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        socketManager.disconnect(websocket)
+
+@app.get("/record/:id")
+async def record_clip(background_tasks: BackgroundTasks):
+    background_tasks.add_task(clipManagers[id].start_recording)
+    return {"message": "Recording started"}
+
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     clipManager.stop()
