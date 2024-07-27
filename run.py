@@ -192,7 +192,7 @@ def stream_rtsp(option: SnapUpdateModel):
     response = Snap.update(option.target, option.url, option.data)
     return response
 
-@app.websocket("/ws")
+@app.websocket("/message")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
