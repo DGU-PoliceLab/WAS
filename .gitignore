@@ -159,5 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+.DS_Store
+
 /static/clip/*.mp4
+/static/clip/*.avi
 /static/snap/*.png
