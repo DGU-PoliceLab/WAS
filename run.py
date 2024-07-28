@@ -29,14 +29,10 @@ redis = RedisDB()
 redis_client = aioredis.from_url("redis://localhost:50001")
 mq = RedisMQ()
 socketManager = SocketManager()
-# clipManagers = clipGroup()
+clipManagers = clipGroup()
 
 origins = [
-    "*",
-    # "https://localhost",
-    # "https://localhost:5173",
-    # "https://127.0.0.1",  # 추가 가능한 도메인
-    # "https://127.0.0.1:5173",  # 추가 가능한 도메인
+    "*"
 ]
 
 app.add_middleware(
@@ -153,8 +149,8 @@ def read_log(option: LogCheckModel):
 # Message Services
 @app.post('/message/send')
 def message_send(option: MessageSendModel, background_tasks: BackgroundTasks):
-    # background_tasks.add_task(clipManagers[option.message["location"]].start_recording)
     response = mq.send(option.key, option.message)
+    background_tasks.add_task(clipManagers[option.message["location"]].start_recording, option.message)
     return response
 
 @app.post('/message/recv')

@@ -27,4 +27,4 @@ RUN pip install -r requirements.txt
 EXPOSE 40000
 
 # 애플리케이션 실행
-CMD ["hypercorn", "run:app", "-c", "hypercorn_config.py"]
+CMD ["hypercorn", "run:app", "-c", "hypercorn_config.py", "--reload"]

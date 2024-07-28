@@ -2,6 +2,8 @@ import os
 import cv2
 import threading
 import time
+import base64
+from datetime import datetime
 from collections import deque
 from services.location import read_with_cctv
 
@@ -29,22 +31,24 @@ class ClipManager:
                 self.recording_done_event.set()
             time.sleep(1 / self.fps)
 
-    def start_recording(self):
+    def start_recording(self, message):
+        occured_at = datetime.fromtimestamp(message['occurred_at'])
+        filename = "%s_%s_%s" % (message["location"], message["event"], occured_at)
         self.recording_event.set()
         self.recording_done_event.wait(timeout=5)
-        self.save_clip()
+        self.save_clip(filename)
         self.recording_event.clear()
         self.recording_done_event.clear()
 
-    def save_clip(self):
+    def save_clip(self, filename):
         with self.lock:
             if len(self.buffer) < self.fps * 10:
                 print("Not enough frames to save a clip")
                 return
             path = "./static/clip"
-            filename = f"clip_{time.strftime('%Y%m%d_%H%M%S')}.avi"
+            filename = f"{filename}.mp4"
             save_path = os.path.join(path,filename)
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc = cv2.VideoWriter_fourcc(*'AVC1')
             out = cv2.VideoWriter(save_path, fourcc, self.fps, (self.buffer[0].shape[1], self.buffer[0].shape[0]))
 
             for frame in list(self.buffer):
