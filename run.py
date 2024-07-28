@@ -29,18 +29,14 @@ redis = RedisDB()
 redis_client = aioredis.from_url("redis://localhost:50001")
 mq = RedisMQ()
 socketManager = SocketManager()
-clipManagers = clipGroup()
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger("uvicorn.error")
-logger.setLevel(logging.INFO)
+# clipManagers = clipGroup()
 
 origins = [
     "*",
-    "https://localhost",
-    "https://localhost:5173",
-    "https://127.0.0.1",  # 추가 가능한 도메인
-    "https://127.0.0.1:5173",  # 추가 가능한 도메인
+    # "https://localhost",
+    # "https://localhost:5173",
+    # "https://127.0.0.1",  # 추가 가능한 도메인
+    # "https://127.0.0.1:5173",  # 추가 가능한 도메인
 ]
 
 app.add_middleware(
@@ -157,7 +153,7 @@ def read_log(option: LogCheckModel):
 # Message Services
 @app.post('/message/send')
 def message_send(option: MessageSendModel, background_tasks: BackgroundTasks):
-    background_tasks.add_task(clipManagers[option.message["location"]].start_recording)
+    # background_tasks.add_task(clipManagers[option.message["location"]].start_recording)
     response = mq.send(option.key, option.message)
     return response
 
@@ -206,12 +202,3 @@ async def websocket_endpoint(websocket: WebSocket):
                 await socketManager.broadcast(data)
     except WebSocketDisconnect:
         socketManager.disconnect(websocket)
-
-@app.get("/record/:id")
-async def record_clip(background_tasks: BackgroundTasks):
-    background_tasks.add_task(clipManagers[id].start_recording)
-    return {"message": "Recording started"}
-
-# @app.on_event("shutdown")
-# def shutdown_event():
-#     clipManager.stop()

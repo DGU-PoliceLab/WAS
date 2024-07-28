@@ -1,1 +1,1 @@
-hypercorn run:app -c hypercorn_config.py   
+hypercorn run:app -c hypercorn_config.py --reload
