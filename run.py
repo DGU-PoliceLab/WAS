@@ -184,7 +184,7 @@ def stream_rtsp(option: SnapReadModel):
 
 @app.post("/snap/update")
 def stream_rtsp(option: SnapUpdateModel):
-    response = Snap.update(option.target, option.url, option.data)
+    response = Snap.update(option.target, option.data)
     return response
 
 @app.websocket("/message")

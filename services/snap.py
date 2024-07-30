@@ -6,6 +6,6 @@ def read(target):
     response = objectManager.read(target)
     return response
 
-def update(target, url, data):
-    response = objectManager.update(target, url, data)
+def update(target, data):
+    response = objectManager.update(target, data)
     return response

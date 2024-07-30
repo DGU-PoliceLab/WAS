@@ -161,6 +161,8 @@ cython_debug/
 
 .DS_Store
 
+*.pem
+
 /static/clip/*.mp4
 /static/clip/*.avi
 /static/snap/*.png

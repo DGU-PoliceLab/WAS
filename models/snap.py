@@ -4,7 +4,6 @@ from pydantic import BaseModel
 class SnapModel(BaseModel):
     tid: int
     thumb: str
-    bbox: List[int]
     heart: int
     breath: int
     temp: float
@@ -15,5 +14,4 @@ class SnapReadModel(BaseModel):
 
 class SnapUpdateModel(BaseModel):
     target: str
-    url: str
     data: List[SnapModel]

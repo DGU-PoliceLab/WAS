@@ -34,11 +34,9 @@ class ObjectManager():
             print("Error occurred in utils.objectManage.ObjectManager.read:", e)
             return False
         
-    def update(self, target, url, data):
+    def update(self, target, data):
         try:
-            # data = snapshot(url, data) # disable snapshot function
             objectData = self.read()
-            print(objectData)
             objectData[target] = data
             byteData = self._to_byte(objectData)
             self.conn.set("snap", byteData)
