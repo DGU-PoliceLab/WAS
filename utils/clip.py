@@ -47,8 +47,8 @@ class ClipManager:
                 return
             path = "./static/clip"
             filename = filename.replace("-", "_").replace(":", "_").replace(" ", "_")
-            filename = f"{filename}.mp4"
-            save_path = os.path.join(path,filename)
+            filename_ext = f"{filename}.mp4"
+            save_path = os.path.join(path,filename_ext)
             fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
             out = cv2.VideoWriter(save_path, fourcc, self.fps, (self.buffer[0].shape[1], self.buffer[0].shape[0]))
 
@@ -57,7 +57,7 @@ class ClipManager:
             
             out.release()
             print(f"Clip saved as {filename}")
-            os.system(f"ffmpeg -i ./static/clip/{filename}.mp4 -c:v libx264 -crf 0 ./static/clip/{filename}.mp4")
+            os.system(f"ffmpeg -y -i ./static/clip/{filename}.mp4 -c:v libx264 -crf 0 ./static/clip/{filename}_h264.mp4")
 
     def stop(self):
         self.cap.release()
