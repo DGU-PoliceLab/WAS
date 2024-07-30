@@ -1,0 +1,15 @@
+.env
+```
+# redis
+REDIS_HOST='localhost'
+REDIS_PORT=16379
+REDIS_DATABASE=0
+
+# mysql
+MYSQL_HOST='localhost'
+MYSQL_PORT=13306
+MYSQL_USER='root'
+MYSQL_PASSWORD='1q2w3e4r!'
+MYSQL_DATABASE="pls"
+MYSQL_CHARSET="utf8"
+```
