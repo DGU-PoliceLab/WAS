@@ -43,7 +43,7 @@ def check(name):
 def read_with_cctv():
     try:
         db = MysqlDB()
-        sql = "SELECT l.id as location_id, l.name as location_name, cctv as cctv_id, c.name as cctv_name, url, created_at, thermal_ip, thermal_port, rader_ip, rader_port FROM location as l LEFT JOIN cctv as c ON l.cctv = c.id WHERE c.id IS NOT NULL"
+        sql = "SELECT l.id as location_id, l.name as location_name, cctv as cctv_id, c.name as cctv_name, url, created_at, thermal_ip, thermal_port, rader_ip, rader_port, toilet_ip, toilet_port FROM location as l LEFT JOIN cctv as c ON l.cctv = c.id WHERE c.id IS NOT NULL"
         db.cur.execute(sql)
         response = db.cur.fetchall()
         return response
