@@ -1,3 +1,5 @@
+> 이 저장소는 다음으로 통합되었습니다. [PLATFORM](https://github.com/DGU-PoliceLab/PLATFORM) 저장소를 확인해주세요.
+
 ![thumbnail](/resource/thumb.png)
 
 # 소개
